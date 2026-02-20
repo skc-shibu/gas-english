@@ -22,9 +22,9 @@
  */
 function runGenerate() {
   var config;
-  var prompt = '';
-  var generatedText = '';
-  var errorMessage = '';
+  var prompt = "";
+  var generatedText = "";
+  var errorMessage = "";
   var wordCount = 0;
   var idiomCount = 0;
 
@@ -46,7 +46,7 @@ function runGenerate() {
     // 5. 不足メッセージがあれば先頭に付与
     var chatText = generatedText;
     if (sampled.shortageMessage) {
-      chatText = sampled.shortageMessage + '\n\n' + chatText;
+      chatText = sampled.shortageMessage + "\n\n" + chatText;
     }
 
     // 6. Google Chat へ投稿
@@ -58,16 +58,19 @@ function runGenerate() {
     markRowsAsDone(SHEET_NAME_IDIOMS, sampled.idioms.rows);
 
     // 8. ログ記録
-    writeLog(wordCount, idiomCount, prompt, generatedText, '');
+    // writeLog(wordCount, idiomCount, prompt, generatedText, '');
 
     // 9. 完了ログ
     Logger.log(
-      '完了: 英単語 ' + wordCount + '件 + 英熟語 ' + idiomCount + '件 を生成し、Google Chatへ投稿しました。'
+      "完了: 英単語 " +
+        wordCount +
+        "件 + 英熟語 " +
+        idiomCount +
+        "件 を生成し、Google Chatへ投稿しました。",
     );
-
   } catch (e) {
     errorMessage = e.message || String(e);
-    Logger.log('runGenerate error: ' + errorMessage);
+    Logger.log("runGenerate error: " + errorMessage);
 
     // エラー時もログを残す（済は更新しない）
     writeLog(wordCount, idiomCount, prompt, generatedText, errorMessage);
@@ -99,17 +102,19 @@ function writeLog(wordCount, idiomCount, prompt, response, error) {
       sheet = ss.insertSheet(SHEET_NAME_LOG);
       sheet.appendRow(LOG_HEADERS);
       // ヘッダ行を太字にする
-      sheet.getRange(1, 1, 1, LOG_HEADERS.length).setFontWeight('bold');
+      sheet.getRange(1, 1, 1, LOG_HEADERS.length).setFontWeight("bold");
     }
 
     // プロンプトとレスポンスはセルの上限（50,000文字）を考慮して切り詰め
     var maxCellLen = 40000;
-    var trimmedPrompt   = prompt.length > maxCellLen
-      ? prompt.substring(0, maxCellLen) + '…（切り詰め）'
-      : prompt;
-    var trimmedResponse = response.length > maxCellLen
-      ? response.substring(0, maxCellLen) + '…（切り詰め）'
-      : response;
+    var trimmedPrompt =
+      prompt.length > maxCellLen
+        ? prompt.substring(0, maxCellLen) + "…（切り詰め）"
+        : prompt;
+    var trimmedResponse =
+      response.length > maxCellLen
+        ? response.substring(0, maxCellLen) + "…（切り詰め）"
+        : response;
 
     sheet.appendRow([
       new Date(),
@@ -117,11 +122,10 @@ function writeLog(wordCount, idiomCount, prompt, response, error) {
       idiomCount,
       trimmedPrompt,
       trimmedResponse,
-      error
+      error,
     ]);
   } catch (logError) {
     // ログ書き込み自体が失敗してもメイン処理を止めない
-    Logger.log('ログ書き込みエラー: ' + logError.message);
+    Logger.log("ログ書き込みエラー: " + logError.message);
   }
 }
-

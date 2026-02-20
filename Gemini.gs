@@ -12,33 +12,37 @@
  */
 function callGemini(prompt, config) {
   var apiKey = config[CONFIG_KEY.GEMINI_API_KEY];
-  var model  = config[CONFIG_KEY.GEMINI_MODEL];
-  var temperature    = Number(config[CONFIG_KEY.TEMPERATURE])      || CONFIG_DEFAULTS[CONFIG_KEY.TEMPERATURE];
-  var maxOutputTokens = Number(config[CONFIG_KEY.MAX_OUTPUT_TOKENS]) || CONFIG_DEFAULTS[CONFIG_KEY.MAX_OUTPUT_TOKENS];
+  var model = config[CONFIG_KEY.GEMINI_MODEL];
+  var temperature =
+    Number(config[CONFIG_KEY.TEMPERATURE]) ||
+    CONFIG_DEFAULTS[CONFIG_KEY.TEMPERATURE];
+  var maxOutputTokens =
+    Number(config[CONFIG_KEY.MAX_OUTPUT_TOKENS]) ||
+    CONFIG_DEFAULTS[CONFIG_KEY.MAX_OUTPUT_TOKENS];
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-    + encodeURIComponent(model)
-    + ':generateContent?key=' + encodeURIComponent(apiKey);
+  var url =
+    "https://generativelanguage.googleapis.com/v1beta/models/" +
+    encodeURIComponent(model) +
+    ":generateContent?key=" +
+    encodeURIComponent(apiKey);
 
   var payload = {
     contents: [
       {
-        parts: [
-          { text: prompt }
-        ]
-      }
+        parts: [{ text: prompt }],
+      },
     ],
     generationConfig: {
       temperature: temperature,
-      maxOutputTokens: maxOutputTokens
-    }
+      maxOutputTokens: maxOutputTokens,
+    },
   };
 
   var options = {
-    method: 'post',
-    contentType: 'application/json',
+    method: "post",
+    contentType: "application/json",
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   var response = UrlFetchApp.fetch(url, options);
@@ -46,9 +50,7 @@ function callGemini(prompt, config) {
   var body = response.getContentText();
 
   if (statusCode !== 200) {
-    throw new Error(
-      'Gemini API エラー (HTTP ' + statusCode + '): ' + body
-    );
+    throw new Error("Gemini API エラー (HTTP " + statusCode + "): " + body);
   }
 
   var json = JSON.parse(body);
@@ -57,8 +59,8 @@ function callGemini(prompt, config) {
   var text = extractTextFromGeminiResponse(json);
   if (!text) {
     throw new Error(
-      'Gemini API からテキストを取得できませんでした。レスポンス: ' +
-      JSON.stringify(json).substring(0, 500)
+      "Gemini API からテキストを取得できませんでした。レスポンス: " +
+        JSON.stringify(json).substring(0, 500),
     );
   }
 
@@ -88,7 +90,7 @@ function extractTextFromGeminiResponse(json) {
         texts.push(parts[i].text);
       }
     }
-    return texts.length > 0 ? texts.join('') : null;
+    return texts.length > 0 ? texts.join("") : null;
   } catch (e) {
     return null;
   }

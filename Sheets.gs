@@ -26,10 +26,10 @@ function getUnfinishedRows(sheet) {
 
   for (var i = 0; i < data.length; i++) {
     var done = data[i][0]; // 済列（チェックボックス or 文字列）
-    if (!done || done === false || String(done).trim() === '') {
+    if (!done || done === false || String(done).trim() === "") {
       results.push({
         rowIndex: i + 2, // シート上の行番号（1-indexed、ヘッダ行=1）
-        data: data[i]
+        data: data[i],
       });
     }
   }
@@ -77,7 +77,7 @@ function sampleUnfinishedRows(sheet, count) {
   return {
     rows: sampled,
     requested: count,
-    actual: actual
+    actual: actual,
   };
 }
 
@@ -98,52 +98,53 @@ function sampleAll(config) {
   // 英単語シート
   var wordSheet = ss.getSheetByName(SHEET_NAME_WORDS);
   if (!wordSheet) {
-    throw new Error('「' + SHEET_NAME_WORDS + '」シートが見つかりません。');
+    throw new Error("「" + SHEET_NAME_WORDS + "」シートが見つかりません。");
   }
   validateHeaders(wordSheet, WORD_HEADERS);
 
   // 英熟語シート
   var idiomSheet = ss.getSheetByName(SHEET_NAME_IDIOMS);
   if (!idiomSheet) {
-    throw new Error('「' + SHEET_NAME_IDIOMS + '」シートが見つかりません。');
+    throw new Error("「" + SHEET_NAME_IDIOMS + "」シートが見つかりません。");
   }
   validateHeaders(idiomSheet, IDIOM_HEADERS);
 
-  var wordCount  = Number(config[CONFIG_KEY.WORD_COUNT])  || CONFIG_DEFAULTS[CONFIG_KEY.WORD_COUNT];
-  var idiomCount = Number(config[CONFIG_KEY.IDIOM_COUNT]) || CONFIG_DEFAULTS[CONFIG_KEY.IDIOM_COUNT];
+  var wordCount =
+    Number(config[CONFIG_KEY.WORD_COUNT]) ||
+    CONFIG_DEFAULTS[CONFIG_KEY.WORD_COUNT];
+  var idiomCount =
+    Number(config[CONFIG_KEY.IDIOM_COUNT]) ||
+    CONFIG_DEFAULTS[CONFIG_KEY.IDIOM_COUNT];
 
-  var words  = sampleUnfinishedRows(wordSheet, wordCount);
+  var words = sampleUnfinishedRows(wordSheet, wordCount);
   var idioms = sampleUnfinishedRows(idiomSheet, idiomCount);
 
   // 不足メッセージの組み立て
   var shortages = [];
   if (words.actual < words.requested) {
-    shortages.push(
-      '英単語: ' + words.actual + '/' + words.requested + '件'
-    );
+    shortages.push("英単語: " + words.actual + "/" + words.requested + "件");
   }
   if (idioms.actual < idioms.requested) {
-    shortages.push(
-      '英熟語: ' + idioms.actual + '/' + idioms.requested + '件'
-    );
+    shortages.push("英熟語: " + idioms.actual + "/" + idioms.requested + "件");
   }
 
-  var shortageMessage = '';
+  var shortageMessage = "";
   if (shortages.length > 0) {
-    shortageMessage = '⚠ 未学習データが不足しています（' + shortages.join('、') + '）';
+    shortageMessage =
+      "⚠ 未学習データが不足しています（" + shortages.join("、") + "）";
   }
 
   if (words.actual === 0 && idioms.actual === 0) {
     throw new Error(
-      '未学習の英単語・英熟語がありません。' +
-      'シートに新しいデータを追加するか、済チェックを外してください。'
+      "未学習の英単語・英熟語がありません。" +
+        "シートに新しいデータを追加するか、済チェックを外してください。",
     );
   }
 
   return {
     words: words,
     idioms: idioms,
-    shortageMessage: shortageMessage
+    shortageMessage: shortageMessage,
   };
 }
 

@@ -42,11 +42,11 @@ function splitTextForChat(text) {
   // 水平線で分割を試みる
   var sections = text.split(/\n---\n/);
   var chunks = [];
-  var current = '';
+  var current = "";
 
   for (var i = 0; i < sections.length; i++) {
     var section = sections[i];
-    var separator = (i > 0) ? '\n---\n' : '';
+    var separator = i > 0 ? "\n---\n" : "";
     var candidate = current + separator + section;
 
     if (candidate.length > CHAT_MAX_LENGTH && current.length > 0) {
@@ -80,12 +80,12 @@ function splitTextForChat(text) {
  * @returns {string[]}
  */
 function forceChunkText(text, maxLen) {
-  var lines = text.split('\n');
+  var lines = text.split("\n");
   var chunks = [];
-  var current = '';
+  var current = "";
 
   for (var i = 0; i < lines.length; i++) {
-    var candidate = current ? (current + '\n' + lines[i]) : lines[i];
+    var candidate = current ? current + "\n" + lines[i] : lines[i];
     if (candidate.length > maxLen && current.length > 0) {
       chunks.push(current);
       current = lines[i];
@@ -115,13 +115,13 @@ function forceChunkText(text, maxLen) {
 function convertToChatMarkdown(text) {
   // **...**  →  *...*
   // 非貪欲マッチで最短一致させる
-  var result = text.replace(/\*\*(.+?)\*\*/g, '*$1*');
+  var result = text.replace(/\*\*(.+?)\*\*/g, "*$1*");
 
   // __...__ → *...*（アンダースコア太字もシングルアスタリスクへ）
-  result = result.replace(/__(.+?)__/g, '*$1*');
+  result = result.replace(/__(.+?)__/g, "*$1*");
 
   // ネストした箇条書きをフラット化: 行頭の空白 + "- " → "- "
-  result = result.replace(/^[ \t]+([-*] )/gm, '$1');
+  result = result.replace(/^[ \t]+([-*] )/gm, "$1");
 
   return result;
 }
@@ -134,14 +134,14 @@ function convertToChatMarkdown(text) {
  */
 function postSingleMessage(text, webhookUrl) {
   var payload = {
-    text: text
+    text: text,
   };
 
   var options = {
-    method: 'post',
-    contentType: 'application/json; charset=UTF-8',
+    method: "post",
+    contentType: "application/json; charset=UTF-8",
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   };
 
   var response = UrlFetchApp.fetch(webhookUrl, options);
@@ -150,7 +150,7 @@ function postSingleMessage(text, webhookUrl) {
   if (statusCode !== 200) {
     var body = response.getContentText();
     throw new Error(
-      'Google Chat Webhook エラー (HTTP ' + statusCode + '): ' + body
+      "Google Chat Webhook エラー (HTTP " + statusCode + "): " + body,
     );
   }
 }
